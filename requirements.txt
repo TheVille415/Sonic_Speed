@@ -1,0 +1,5 @@
+###### Requirements without Version Specifiers ######
+gym-retro
+numpy
+opencv-python
+neat-python
