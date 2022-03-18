@@ -6,85 +6,100 @@ import pickle
 
 # Once we install our dependencies, we can import them
 # Our next step is creating a env for the game to run in
+env = retro.make('SonicTheHedgehog-Genesis', 'GreenHillZone.Act1')
+imgarray = []
 
-# making a worker class to run the game
-class Worker(object):
-    def __init__(self, genome, config):
-        self.genome = genome
-        self.config = config
+xpos_end = 0
+
+
+def eval_genomes(genomes, config):
+
+
+    for genome_id, genome in genomes:
+        ob = env.reset()
+        ac = env.action_space.sample()
+
+        inx, iny, inc = env.observation_space.shape
+
+        inx = int(inx/8)
+        iny = int(iny/8)
+
+        net = neat.nn.recurrent.RecurrentNetwork.create(genome, config)
         
-    def work(self):
-        
-        self.env = retro.make('SonicTheHedgehog-Genesis', 'GreenHillZone.Act1')
-        
-        self.env.reset()
-        
-        ob, _, _, _ = self.env.step(self.env.action_space.sample())
-        
-        inx = int(ob.shape[0]/8)
-        iny = int(ob.shape[1]/8)
-        done = False
-        
-        net = neat.nn.FeedForwardNetwork.create(self.genome, self.config)
-        
-        fitness = 0
+        current_max_fitness = 0
+        fitness_current = 0
+        frame = 0
+        counter = 0
         xpos = 0
         xpos_max = 0
-        counter = 0
-        imgarray = []
         
+        done = False
+        #cv2.namedWindow("main", cv2.WINDOW_NORMAL)
+
         while not done:
-            # self.env.render()
+            
+            env.render()
+            frame += 1
+            #scaledimg = cv2.cvtColor(ob, cv2.COLOR_BGR2RGB)
+            #scaledimg = cv2.resize(scaledimg, (iny, inx)) 
             ob = cv2.resize(ob, (inx, iny))
             ob = cv2.cvtColor(ob, cv2.COLOR_BGR2GRAY)
-            ob = np.reshape(ob, (inx, iny))
-            
-            imgarray = np.ndarray.flatten(ob)
-            imgarray = np.interp(imgarray, (0, 254), (-1, +1))
-            actions = net.activate(imgarray)
-            
-            ob, rew, done, info = self.env.step(actions)
-            
-            xpos = info['x']
+            ob = np.reshape(ob, (inx,iny))
+            #cv2.imshow('main', scaledimg)
+            #cv2.waitKey(1) 
 
+            imgarray = np.ndarray.flatten(ob)
+
+            nnOutput = net.activate(imgarray)
             
-            if xpos > xpos_max:
-                xpos_max = xpos
+            ob, rew, done, info = env.step(nnOutput)
+            
+            
+            #xpos = info['x']
+            #xpos_end = info['screen_x_end']
+            
+            
+            #if xpos > xpos_max:
+                #fitness_current += 1
+                #xpos_max = xpos
+            
+            #if xpos == xpos_end and xpos > 500:
+                #fitness_current += 100000
+                #done = True
+            
+            fitness_current += rew
+            
+            if fitness_current > current_max_fitness:
+                current_max_fitness = fitness_current
                 counter = 0
-                fitness += 1
             else:
                 counter += 1
                 
-            if counter > 250:
+            if done or counter == 250:
                 done = True
+                print(genome_id, fitness_current)
                 
-            if xpos == info['screen_x_end'] and xpos > 500:
-                fitness += 100000
-                done = True
+            genome.fitness = fitness_current
                 
-        print(fitness)
-        return fitness
-
-def eval_genomes(genome, config):
+            
+            
     
-    worky = Worker(genome, config)
-    return worky.work()
+
+config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
+                     neat.DefaultSpeciesSet, neat.DefaultStagnation,
+                     'config-feedforward')
+
+p = neat.Population(config)
 
 
-config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction, 
-                     neat.DefaultSpeciesSet, neat.DefaultStagnation, 
-                     'config-feedforward.txt')
+p.add_reporter(neat.StdOutReporter(True))
+stats = neat.StatisticsReporter()
+p.add_reporter(stats)
+p.add_reporter(neat.Checkpointer(10))
 
-# p = neat.Population(config)
-# p = neat.Checkpointer.restore_checkpoint('neat-checkpoint-13')
-# p.add_reporter(neat.StdOutReporter(True))
-# stats = neat.StatisticsReporter()
-# p.add_reporter(stats)
-# p.add_reporter(neat.Checkpointer(10))
+winner = p.run(eval_genomes)
 
-# pe = neat.ParallelEvaluator(10, eval_genomes)
+with open('winner.pkl', 'wb') as output:
+    pickle.dump(winner, output, 1)
+    
 
-# winner = p.run(pe.evaluate)
-
-# with open('winner.pkl', 'wb') as output:
-#     pickle.dump(winner, output, 1)
