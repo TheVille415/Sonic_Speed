@@ -38,7 +38,7 @@ $ python sonic.py
 
 
 For informaiton on this or guidance check out these resources here:
-[Open AI Getting Started](https://retro.readthedocs.io/en/latest/getting_started.html)
-[Open AI Retro Github](https://github.com/openai/retro)
-[Sonic Steam Link](https://store.steampowered.com/app/71113/Sonic_The_Hedgehog/)
-
+1. [Open AI Getting Started](https://retro.readthedocs.io/en/latest/getting_started.html)
+2. [Open AI Retro Github](https://github.com/openai/retro)
+3. [Neat Python](https://neat-python.readthedocs.io/en/latest/)
+4. [Sonic Steam Link](https://store.steampowered.com/app/71113/Sonic_The_Hedgehog/)
