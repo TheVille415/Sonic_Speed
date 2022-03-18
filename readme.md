@@ -10,6 +10,8 @@ Running this command will make sure you are running the correct version of pytho
 $ conda create --name gym36 python=3.6 
 ```
 
+Activating the enviornment 
+
 ```
 $ conda activate gym36 
 ```
@@ -36,3 +38,7 @@ $ python sonic.py
 
 
 For informaiton on this or guidance check out these resources here:
+[Open AI Getting Started](https://retro.readthedocs.io/en/latest/getting_started.html)
+[Open AI Retro Github](https://github.com/openai/retro)
+[Sonic Steam Link](https://store.steampowered.com/app/71113/Sonic_The_Hedgehog/)
+
