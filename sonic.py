@@ -65,6 +65,26 @@ class Worker(object):
         print(fitness)
         return fitness
 
+def eval_genomes(genome, config):
+    
+    worky = Worker(genome, config)
+    return worky.work()
 
 
-config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, 'config-feedforward.txt')
+config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction, 
+                     neat.DefaultSpeciesSet, neat.DefaultStagnation, 
+                     'config-feedforward.txt')
+
+# p = neat.Population(config)
+# p = neat.Checkpointer.restore_checkpoint('neat-checkpoint-13')
+# p.add_reporter(neat.StdOutReporter(True))
+# stats = neat.StatisticsReporter()
+# p.add_reporter(stats)
+# p.add_reporter(neat.Checkpointer(10))
+
+# pe = neat.ParallelEvaluator(10, eval_genomes)
+
+# winner = p.run(pe.evaluate)
+
+# with open('winner.pkl', 'wb') as output:
+#     pickle.dump(winner, output, 1)
